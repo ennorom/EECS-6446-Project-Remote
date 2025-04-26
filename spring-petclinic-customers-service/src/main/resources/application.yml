@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: customers-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/}
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+    import: configserver:http://config-server:8888
+
+---
+spring:
+  config:
+    activate:
+      on-profile: ecs
+    import: configserver:${CONFIG_SERVER_URL:http://config-server.spring-petclinic.local:8888}
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://discovery-server.spring-petclinic.local:8761/eureka/}

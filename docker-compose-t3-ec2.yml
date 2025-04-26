@@ -1,0 +1,141 @@
+version: '3'
+services:
+  config-server:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-config-server:latest
+    container_name: config-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-I", "http://config-server:8888"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+     - 18888:8888
+
+  discovery-server:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-discovery-server:latest
+    container_name: discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      config-server:
+        condition: service_healthy
+    ports:
+     - 18761:8761
+
+  customers-service:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-customers-service:latest
+    container_name: customers-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    ports:
+    - 18081:8081
+
+  visits-service:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-visits-service:latest
+    container_name: visits-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    ports:
+     - 18082:8082
+
+  vets-service:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-vets-service:latest
+    container_name: vets-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    ports:
+     - 18083:8083
+
+
+  genai-service:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-genai-service:latest
+    container_name: genai-service
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    ports:
+     - 18084:8084
+
+
+  api-gateway:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-api-gateway:latest
+    container_name: api-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    ports:
+     - 18080:8080
+
+  tracing-server:
+    image: openzipkin/zipkin
+    container_name: tracing-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+    # Waiting for https://github.com/openzipkin/zipkin/issues/3786
+    - JAVA_OPTS=-XX:UseSVE=0
+    ports:
+     - 19411:9411
+
+  admin-server:
+    image: 859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-admin-server:latest
+    container_name: admin-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    ports:
+     - 19090:9090

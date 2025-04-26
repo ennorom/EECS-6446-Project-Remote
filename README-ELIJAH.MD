@@ -27,7 +27,7 @@ spring-petclinic-vets-service/src/main/resources/application-ecs.yml
 spring-petclinic-vets-service/src/main/resources/application.yml
 
 
-Raw_Experiment_Data.zip - Contains the raw file with data from the experiment 
+FOLDER: Raw_Experiment_Data - Contains the raw file with data from the experiment 
 results_with_cpu_ec2_5.csv - ec2_5 users
 results_with_cpu_ec2_10.csv - ec2_10 users
 results_with_cpu_ec2_20.csv - ec2_20 users
@@ -37,7 +37,7 @@ results_with_cpu_ecs_10.csv - ecs_10 users
 results_with_cpu_ecs_20.csv - ecs_20 users
 results_with_cpu_ecs_50.csv - ecs_50 users
 
-Task-Definition.zip - Task Definition for ECS deployment 
+FOLDER: Task-Definition - Task Definition for ECS deployment 
 task-definition-admin-server.json
 task-definition-api-gateway.json
 task-definition-customers-service.json

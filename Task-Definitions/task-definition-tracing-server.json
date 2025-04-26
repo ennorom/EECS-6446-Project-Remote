@@ -1,0 +1,40 @@
+{
+  "family": "customers-service",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "customers-service",
+      "image": "859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-<service-name>:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8081,
+          "hostPort": 8081
+        }
+      ],
+      "dependsOn": [
+        {
+          "containerName": "config-server",
+          "condition": "HEALTHY"
+        },
+        {
+          "containerName": "discovery-server",
+          "condition": "HEALTHY"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/spring-petclinic",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "customers-service"
+        }
+      }
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::859998883608:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::859998883608:role/ecsTaskRole"
+}

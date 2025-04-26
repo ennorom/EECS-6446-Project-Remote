@@ -1,0 +1,53 @@
+{
+  "family": "spring-petclinic-api-gateway",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "spring-petclinic-api-gateway",
+      "image": "859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-api-gateway:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "ecs/spring-petclinic",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "api-gateway"
+        }
+      },
+      "environment": [
+          {
+            "name": "SPRING_PROFILES_ACTIVE",
+            "value": "ecs"
+          },
+          {
+            "name": "CONFIG_SERVER_URL",
+            "value": "http://config-server.spring-petclinic.local:8888"
+          }
+          ,
+          {
+            "name": "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE",
+            "value": "http://discovery-server.spring-petclinic.local:8761/eureka/"
+          },
+          { "name": "VETS_SERVICE_URL", "value": "http://vets-service.spring-petclinic.local:8083" },
+          { "name": "VISITS_SERVICE_URL", "value": "http://visits-service.spring-petclinic.local:8082" },
+          { "name": "CUSTOMERS_SERVICE_URL", "value": "http://customers-service.spring-petclinic.local:8081" },
+          { "name": "GENAI_SERVICE_URL", "value": "http://genai-service.spring-petclinic.local:8084" }       ,
+          {
+            "name": "SERVER_PORT",
+            "value": "8080"
+          }
+        ]
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::859998883608:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::859998883608:role/ecsTaskRole"
+}

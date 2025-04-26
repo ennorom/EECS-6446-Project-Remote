@@ -1,0 +1,52 @@
+{
+    "family": "spring-petclinic-discovery-server",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "256",
+    "memory": "512",
+    "containerDefinitions": [
+      {
+        "name": "spring-petclinic-discovery-server",
+        "image": "859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-discovery-server:latest",
+        "essential": true,
+        "portMappings": [
+          {
+            "containerPort": 8761,
+            "hostPort": 8761
+          }
+        ],
+        "healthCheck": {
+          "command": ["CMD", "curl", "-f", "http://localhost:8761"],
+          "interval": 5,
+          "timeout": 3,
+          "retries": 10,
+          "startPeriod": 60
+        },
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "ecs/spring-petclinic",
+            "awslogs-region": "us-east-2",
+            "awslogs-stream-prefix": "discovery-server"
+          }
+        },
+        "environment": [
+          {
+            "name": "SPRING_PROFILES_ACTIVE",
+            "value": "ecs"
+          },
+          {
+            "name": "CONFIG_SERVER_URL",
+            "value": "http://config-server.spring-petclinic.local:8888"
+          },
+          {
+            "name": "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE",
+            "value": "http://discovery-server.spring-petclinic.local:8761/eureka/"
+          }
+        ]
+      }
+    ],
+    "executionRoleArn": "arn:aws:iam::859998883608:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::859998883608:role/ecsTaskRole"
+  }
+  

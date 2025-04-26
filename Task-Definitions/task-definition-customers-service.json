@@ -1,0 +1,48 @@
+{
+  "family": "spring-petclinic-customers-service",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "spring-petclinic-customers-service",
+      "image": "859998883608.dkr.ecr.us-east-2.amazonaws.com/spring-petclinic-customers-service:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8081,
+          "hostPort": 8081
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "ecs/spring-petclinic",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "customers-service"
+        }
+      },
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "ecs"
+        },
+        {
+          "name": "CONFIG_SERVER_URL",
+          "value": "http://config-server.spring-petclinic.local:8888"
+        },
+        {
+          "name": "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE",
+          "value": "http://discovery-server.spring-petclinic.local:8761/eureka/"
+        },
+        {
+          "name": "SERVER_PORT",
+          "value": "8081"
+        }
+      ]
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::859998883608:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::859998883608:role/ecsTaskRole"
+}

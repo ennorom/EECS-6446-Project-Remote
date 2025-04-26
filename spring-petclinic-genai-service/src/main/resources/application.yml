@@ -1,0 +1,50 @@
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: genai-service
+  profiles:
+    active: production
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/},optional:classpath:/creds.yaml
+  ai:
+    chat:
+      client:
+        enabled: true
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+            temperature: 0.7
+            model: gpt-4o-mini
+
+
+logging:
+  level:
+    org:
+      springframework:
+        ai:
+          chat:
+            client:
+              advisor: DEBUG
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+    import: configserver:http://config-server:8888
+
+---
+spring:
+  config:
+    activate:
+      on-profile: ecs
+    import: configserver:${CONFIG_SERVER_URL:http://config-server.spring-petclinic.local:8888}
+
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://discovery-server.spring-petclinic.local:8761/eureka/}

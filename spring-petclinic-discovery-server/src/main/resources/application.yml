@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: discovery-server
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/}
+
+# Avoid some debugging logs at startup
+logging:
+  level:
+    org:
+      springframework:
+        boot: INFO
+        web: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+    import: configserver:http://config-server:8888
+
+---
+spring:
+  config:
+    activate:
+      on-profile: ecs
+    import: configserver:${CONFIG_SERVER_URL:http://config-server.spring-petclinic.local:8888}
+
+eureka:
+  instance:
+    hostname: discovery-server
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      registerWithEureka: false
+      fetchRegistry: false
